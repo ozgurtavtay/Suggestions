@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,11 +13,17 @@ namespace Naming
 {
     public partial class Form1 : Form
     {
-        Suggestions s = new Suggestions();
+        public List<string> Names;
 
         public Form1()
         {
             InitializeComponent();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            var logFile = File.ReadAllLines("../../NameSuggestions.txt");
+            Names = new List<string>(logFile);
         }
 
         private void textBoxName_TextChanged(object sender, EventArgs e)
@@ -27,7 +34,7 @@ namespace Naming
             if (str != "")
             {
                 bool isFirst = true;
-                foreach (string name in s.Names)
+                foreach (string name in Names)
                 {
                     if (name.ToLower().IndexOf(str) == 0)
                     {
@@ -57,7 +64,7 @@ namespace Naming
         {
             try
             {
-                s.Names.Add(textBoxName.Text);
+                Names.Add(textBoxName.Text);
                 MessageBox.Show(textBoxName.Text + " Added to Suggestions List");
                 textBoxName.Clear();
                 textBoxName.Focus();
@@ -67,6 +74,13 @@ namespace Naming
             {
                 MessageBox.Show(ex.Message);
             }
+
+            using (TextWriter tw = new StreamWriter("../../NameSuggestions.txt"))
+            {
+                foreach (String str in Names)
+                    tw.WriteLine(str);
+            }
         }
+
     }
 }
